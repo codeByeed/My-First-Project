@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,8 +8,9 @@ public class Controller : MonoBehaviour
 {
 
     Rigidbody rb;
-    Transform tr;
+    
     int count = 0;
+    bool isGrounded;
     [SerializeField] float speed = 5f;
     [SerializeField] float jumpHeight = 5f;
     [SerializeField] float flattenScale = 2f;
@@ -42,7 +44,11 @@ public class Controller : MonoBehaviour
 
     void OnJump()
     {
-        Jump();
+        if(isGrounded)
+        {
+            Jump();
+        }
+        
     }
 
     private void Jump()
@@ -62,13 +68,33 @@ public class Controller : MonoBehaviour
         {
             transform.localScale = new Vector3(transform.localScale.x * 2, transform.localScale.y / 2, transform.localScale.z * 2);
             count++;
+            transform.position = new Vector3(transform.position.x, transform.position.y - .25f, transform.position.z);
         }
 
         else
         {
-            transform.localScale = new Vector3(transform.localScale.x/2, transform.localScale.y*2, transform.localScale.z/2);
+            transform.localScale = new Vector3(transform.localScale.x / 2, transform.localScale.y * 2, transform.localScale.z / 2);
             count--;
         }
-
     }
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.CompareTag("Ground"))
+                 isGrounded = true;
+            Debug.Log(isGrounded);
+        }
+
+        private void OnCollisionExit(Collision thing)
+        {
+            if (thing.gameObject.CompareTag("Ground"))
+                isGrounded = false;
+            Debug.Log(isGrounded);
+        }
+
+        private void OnCollisionStay(Collision collision)
+        {
+        
+        }
+// you can compare the normal vectors of the collision and the ground so to see if the angle is too great to jump
+    
 }
